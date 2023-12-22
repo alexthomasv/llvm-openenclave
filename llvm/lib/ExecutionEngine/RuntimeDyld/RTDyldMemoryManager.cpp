@@ -124,12 +124,12 @@ void RTDyldMemoryManager::registerEHFramesInProcess(uint8_t *Addr,
 
   // How can it find the end? Because crtendS.o is linked
   // in and it has an .eh_frame section with four zero chars.
-  __register_frame(Addr);
+  // __register_frame(Addr);
 }
 
 void RTDyldMemoryManager::deregisterEHFramesInProcess(uint8_t *Addr,
                                                       size_t Size) {
-  __deregister_frame(Addr);
+  // __deregister_frame(Addr);
 }
 
 #endif

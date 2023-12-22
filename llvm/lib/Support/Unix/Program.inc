@@ -316,7 +316,7 @@ static bool Execute(ProcessInfo &PI, StringRef Program,
       // object destructors cloned from the parent process aren't
       // redundantly run, and so that any data buffered in stdio buffers
       // cloned from the parent aren't redundantly written out.
-      _exit(errno == ENOENT ? 127 : 126);
+      exit(errno == ENOENT ? 127 : 126);
     }
 
     // Parent process: Break out of the switch to do our processing.

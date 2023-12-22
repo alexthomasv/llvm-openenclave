@@ -220,6 +220,7 @@ void llvm::get_thread_name(SmallVectorImpl<char> &Name) {
 
   Name.append(buf, buf + strlen(buf));
 #elif defined(__linux__)
+#define HAVE_PTHREAD_GETNAME_NP 0
 #if HAVE_PTHREAD_GETNAME_NP
   constexpr uint32_t len = get_max_thread_name_length_impl();
   char Buffer[len] = {'\0'};  // FIXME: working around MSan false positive.

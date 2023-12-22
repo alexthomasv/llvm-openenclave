@@ -7,12 +7,12 @@ if( MSVC OR MINGW )
   # advapi32 required for CryptAcquireContextW in lib/Support/Windows/Path.inc.
   set(system_libs ${system_libs} psapi shell32 ole32 uuid advapi32)
 elseif( CMAKE_HOST_UNIX )
-  if( HAVE_LIBRT )
-    set(system_libs ${system_libs} rt)
-  endif()
-  if( HAVE_LIBDL )
-    set(system_libs ${system_libs} ${CMAKE_DL_LIBS})
-  endif()
+  # if( HAVE_LIBRT )
+  #   set(system_libs ${system_libs} rt)
+  # endif()
+  # if( HAVE_LIBDL )
+  #   set(system_libs ${system_libs} ${CMAKE_DL_LIBS})
+  # endif()
   if( HAVE_BACKTRACE AND NOT "${Backtrace_LIBRARIES}" STREQUAL "" )
     # On BSDs, CMake returns a fully qualified path to the backtrace library.
     # We need to remove the path and the 'lib' prefix, to make it look like a
@@ -29,10 +29,10 @@ elseif( CMAKE_HOST_UNIX )
   if( LLVM_ENABLE_THREADS AND HAVE_LIBATOMIC )
     set(system_libs ${system_libs} atomic)
   endif()
-  set(system_libs ${system_libs} ${LLVM_PTHREAD_LIB})
-  if( UNIX AND NOT (BEOS OR HAIKU) )
-    set(system_libs ${system_libs} m)
-  endif()
+  # set(system_libs ${system_libs} ${LLVM_PTHREAD_LIB})
+  # if( UNIX AND NOT (BEOS OR HAIKU) )
+  #   set(system_libs ${system_libs} m)
+  # endif()
   if( FUCHSIA )
     set(system_libs ${system_libs} zircon)
   endif()
@@ -190,6 +190,8 @@ add_llvm_component_library(LLVMSupport
   )
 
 set_property(TARGET LLVMSupport PROPERTY LLVM_SYSTEM_LIBS "${system_libs}")
+
+message(LLVM_SYSTEM_LIBS=${LLVM_SYSTEM_LIBS})
 
 if(LLVM_WITH_Z3)
   target_include_directories(LLVMSupport SYSTEM

@@ -408,6 +408,19 @@ function(llvm_add_library name)
     "OUTPUT_NAME;PLUGIN_TOOL;ENTITLEMENTS;BUNDLE_PATH"
     "ADDITIONAL_HEADERS;DEPENDS;LINK_COMPONENTS;LINK_LIBS;OBJLIBS"
     ${ARGN})
+
+    if("${name}" MATCHES ".*_NOE")
+      set(X_LIST "")
+  
+      foreach(x ${ARG_LINK_COMPONENTS})
+        list(APPEND X_LIST "${x}_NOE")
+      endforeach()
+      set(ARG_LINK_COMPONENTS ${X_LIST})
+      # message(ARG_LINK_COMPONENTS=${ARG_LINK_COMPONENTS})
+    endif()
+
+  # message(ARG_LINK_COMPONENTS=${ARG_LINK_COMPONENTS})
+
   list(APPEND LLVM_COMMON_DEPENDS ${ARG_DEPENDS})
   if(ARG_ADDITIONAL_HEADERS)
     # Pass through ADDITIONAL_HEADERS.
@@ -605,11 +618,36 @@ function(llvm_add_library name)
     set(libtype PRIVATE)
   endif()
 
-  target_link_libraries(${name} ${libtype}
+        
+  # message(name="${name}")
+
+  if("${name}" MATCHES ".*_NOE")
+    target_link_libraries(${name} ${libtype}
       ${ARG_LINK_LIBS}
       ${lib_deps}
       ${llvm_libs}
       )
+  else()  
+      find_package(OpenEnclave CONFIG REQUIRED)
+      set(OE_CRYPTO_LIB
+        mbedtls
+      CACHE STRING "Crypto library used by enclaves.")
+      target_link_libraries(${name} ${libtype}
+      ${ARG_LINK_LIBS}
+      ${lib_deps}
+      ${llvm_libs}
+      openenclave::oeenclave 
+      openenclave::oecrypto${OE_CRYPTO_LIB} 
+      openenclave::oelibcxx 
+      openenclave::oehostfs
+      )    
+  endif()
+
+  # target_link_libraries(${name} ${libtype}
+  #     ${ARG_LINK_LIBS}
+  #     ${lib_deps}
+  #     ${llvm_libs}
+  #     )
 
   if(LLVM_COMMON_DEPENDS)
     add_dependencies(${name} ${LLVM_COMMON_DEPENDS})
@@ -694,11 +732,17 @@ macro(add_llvm_library name)
     ""
     ${ARGN})
   if(ARG_MODULE)
+    message(name=${name})
+    message(ARG_UNPARSED_ARGUMENTS=${ARG_UNPARSED_ARGUMENTS})
+
     llvm_add_library(${name} MODULE ${ARG_UNPARSED_ARGUMENTS})
+    llvm_add_library(${name}_NOE MODULE ${ARG_UNPARSED_ARGUMENTS})
   elseif( BUILD_SHARED_LIBS OR ARG_SHARED )
     llvm_add_library(${name} SHARED ${ARG_UNPARSED_ARGUMENTS})
+    llvm_add_library(${name}_NOE SHARED ${ARG_UNPARSED_ARGUMENTS})
   else()
     llvm_add_library(${name} ${ARG_UNPARSED_ARGUMENTS})
+    llvm_add_library(${name}_NOE ${ARG_UNPARSED_ARGUMENTS})
   endif()
 
   # Libraries that are meant to only be exposed via the build tree only are

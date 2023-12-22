@@ -339,15 +339,15 @@ set(LLVM_TARGET_ARCH "host"
 
 option(LLVM_ENABLE_TERMINFO "Use terminfo database if available." ON)
 
-set(LLVM_ENABLE_LIBXML2 "ON" CACHE STRING "Use libxml2 if available. Can be ON, OFF, or FORCE_ON")
+set(LLVM_ENABLE_LIBXML2 "OFF" CACHE STRING "Use libxml2 if available. Can be ON, OFF, or FORCE_ON")
 
 option(LLVM_ENABLE_LIBEDIT "Use libedit if available." ON)
 
 option(LLVM_ENABLE_LIBPFM "Use libpfm for performance counters if available." ON)
 
-option(LLVM_ENABLE_THREADS "Use threads if available." ON)
+option(LLVM_ENABLE_THREADS "Use threads if available." OFF)
 
-option(LLVM_ENABLE_ZLIB "Use zlib for compression/decompression if available." ON)
+option(LLVM_ENABLE_ZLIB "Use zlib for compression/decompression if available." OFF)
 
 set(LLVM_Z3_INSTALL_DIR "" CACHE STRING "Install directory of the Z3 solver.")
 
@@ -371,7 +371,7 @@ if (LLVM_ENABLE_Z3_SOLVER)
     message(FATAL_ERROR "LLVM_ENABLE_Z3_SOLVER cannot be enabled when Z3 is not available.")
   endif()
 
-  set(LLVM_WITH_Z3 1)
+  set(LLVM_WITH_Z3 0)
 endif()
 
 if( LLVM_TARGETS_TO_BUILD STREQUAL "all" )
@@ -489,13 +489,13 @@ endif()
 # components which may not strictly be necessary (tools, examples, and tests).
 #
 # This is primarily to support building smaller or faster project files.
-option(LLVM_INCLUDE_TOOLS "Generate build targets for the LLVM tools." ON)
+option(LLVM_INCLUDE_TOOLS "Generate build targets for the LLVM tools." OFF)
 option(LLVM_BUILD_TOOLS
-  "Build the LLVM tools. If OFF, just generate build targets." ON)
+  "Build the LLVM tools. If OFF, just generate build targets." OFF)
 
-option(LLVM_INCLUDE_UTILS "Generate build targets for the LLVM utils." ON)
+option(LLVM_INCLUDE_UTILS "Generate build targets for the LLVM utils." OFF)
 option(LLVM_BUILD_UTILS
-  "Build LLVM utility binaries. If OFF, just generate build targets." ON)
+  "Build LLVM utility binaries. If OFF, just generate build targets." CMAKE_OBJC_LINK_LIBRARY_FILE_FLAG)
 
 option(LLVM_INCLUDE_RUNTIMES "Generate build targets for the LLVM runtimes." ON)
 option(LLVM_BUILD_RUNTIMES
@@ -505,7 +505,7 @@ option(LLVM_BUILD_RUNTIME
   "Build the LLVM runtime libraries." ON)
 option(LLVM_BUILD_EXAMPLES
   "Build the LLVM example programs. If OFF, just generate build targets." OFF)
-option(LLVM_INCLUDE_EXAMPLES "Generate build targets for the LLVM examples" ON)
+option(LLVM_INCLUDE_EXAMPLES "Generate build targets for the LLVM examples" OFF)
 
 if(LLVM_BUILD_EXAMPLES)
   add_definitions(-DBUILD_EXAMPLES)
@@ -513,15 +513,15 @@ endif(LLVM_BUILD_EXAMPLES)
 
 option(LLVM_BUILD_TESTS
   "Build LLVM unit tests. If OFF, just generate build targets." OFF)
-option(LLVM_INCLUDE_TESTS "Generate build targets for the LLVM unit tests." ON)
-option(LLVM_INCLUDE_GO_TESTS "Include the Go bindings tests in test build targets." ON)
+option(LLVM_INCLUDE_TESTS "Generate build targets for the LLVM unit tests." OFF)
+option(LLVM_INCLUDE_GO_TESTS "Include the Go bindings tests in test build targets." OFF)
 
 option(LLVM_BUILD_BENCHMARKS "Add LLVM benchmark targets to the list of default
 targets. If OFF, benchmarks still could be built using Benchmarks target." OFF)
-option(LLVM_INCLUDE_BENCHMARKS "Generate benchmark targets. If OFF, benchmarks can't be built." ON)
+option(LLVM_INCLUDE_BENCHMARKS "Generate benchmark targets. If OFF, benchmarks can't be built." OFF)
 
 option (LLVM_BUILD_DOCS "Build the llvm documentation." OFF)
-option (LLVM_INCLUDE_DOCS "Generate build targets for llvm documentation." ON)
+option (LLVM_INCLUDE_DOCS "Generate build targets for llvm documentation." OFF)
 option (LLVM_ENABLE_DOXYGEN "Use doxygen to generate llvm API documentation." OFF)
 option (LLVM_ENABLE_SPHINX "Use Sphinx to generate llvm documentation." OFF)
 option (LLVM_ENABLE_OCAMLDOC "Build OCaml bindings documentation." ON)
@@ -896,11 +896,11 @@ add_subdirectory(include/llvm)
 add_subdirectory(lib)
 
 if( LLVM_INCLUDE_UTILS )
-  add_subdirectory(utils/FileCheck)
-  add_subdirectory(utils/PerfectShuffle)
-  add_subdirectory(utils/count)
-  add_subdirectory(utils/not)
-  add_subdirectory(utils/yaml-bench)
+  # add_subdirectory(utils/FileCheck)
+  # add_subdirectory(utils/PerfectShuffle)
+  # add_subdirectory(utils/count)
+  # add_subdirectory(utils/not)
+  # add_subdirectory(utils/yaml-bench)
 else()
   if ( LLVM_INCLUDE_TESTS )
     message(FATAL_ERROR "Including tests when not building utils will not work.
@@ -985,6 +985,15 @@ if (LLVM_INCLUDE_DOCS)
 endif()
 
 add_subdirectory(cmake/modules)
+
+# Use the edger8r to generate C bindings from the EDL file.
+add_custom_command(
+  OUTPUT helloworld_t.h helloworld_t.c helloworld_args.h
+  DEPENDS ${CMAKE_SOURCE_DIR}/helloworld.edl
+  COMMAND
+    openenclave::oeedger8r --trusted ${CMAKE_SOURCE_DIR}/helloworld.edl
+    --search-path ${OE_INCLUDEDIR} --search-path
+    ${OE_INCLUDEDIR}/openenclave/edl/sgx)
 
 # Do this last so that all lit targets have already been created.
 if (LLVM_INCLUDE_UTILS)
