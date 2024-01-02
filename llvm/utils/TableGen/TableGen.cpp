@@ -258,7 +258,10 @@ int main(int argc, char **argv) {
   PrettyStackTraceProgram X(argc, argv);
   cl::ParseCommandLineOptions(argc, argv);
 
-  llvm_shutdown_obj Y;
+  // llvm_shutdown_obj calls call_once(), which requires pthread support
+  // table-gen doesn't NOT need to be in-enclave.. but this is just a hacky way
+  // to get rid of -lpthread flag, because it's needed as part of the build process for /libs
+  // llvm_shutdown_obj Y;
 
   return TableGenMain(argv[0], &LLVMTableGenMain);
 }

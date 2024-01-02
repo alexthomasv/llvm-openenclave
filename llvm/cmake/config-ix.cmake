@@ -82,6 +82,9 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
   endif()
 endif()
 
+# OpenEnclave doesn't support -lpthread
+set(HAVE_LIBPTHREAD 0)
+
 # library checks
 if( NOT PURE_WINDOWS )
   check_library_exists(pthread pthread_create "" HAVE_LIBPTHREAD)
