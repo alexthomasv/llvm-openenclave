@@ -1,3 +1,13 @@
+# LLVM Libraries for OpenEnclave
+
+```
+cd llvm
+mkdir build
+cmake ..
+sudo make lib install -j4
+```
+This has not been tested to work outside the libraries in llvm/lib/. 
+
 # The LLVM Compiler Infrastructure
 
 This directory and its subdirectories contain source code for LLVM,

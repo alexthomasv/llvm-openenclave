@@ -22,11 +22,6 @@
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/MathExtras.h"
 #include <mutex>
-// #include "WAVM/WASM/WASM.h"
-
-#define INFO(msg) \
-    fprintf(stderr, "[INFO] %s:%d: ", __FILE__, __LINE__); \
-    fprintf(stderr, "%s", msg);
 
 #include <future>
 
@@ -1312,9 +1307,7 @@ createRuntimeDyldMachO(
 std::unique_ptr<RuntimeDyld::LoadedObjectInfo>
 RuntimeDyld::loadObject(const ObjectFile &Obj) {
   if (!Dyld) {
-    INFO("!Dyld\n");
     if (Obj.isELF()){
-      INFO("Obj.isELF\n");
       Dyld =
       createRuntimeDyldELF(static_cast<Triple::ArchType>(Obj.getArch()),
                             MemMgr, Resolver, ProcessAllSections,
@@ -1336,7 +1329,6 @@ RuntimeDyld::loadObject(const ObjectFile &Obj) {
   if (!Dyld->isCompatibleFile(Obj))
     report_fatal_error("Incompatible object format!");
 
-  INFO("auto LoadedObjInfo = Dyld->loadObject(Obj);\n");
   auto LoadedObjInfo = Dyld->loadObject(Obj);
   MemMgr.notifyObjectLoaded(*this, Obj);
   return LoadedObjInfo;

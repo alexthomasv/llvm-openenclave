@@ -395,7 +395,6 @@ void CallInst::init(FunctionType *FTy, Value *Func, ArrayRef<Value *> Args,
          "Calling a function with bad signature!");
 
   for (unsigned i = 0; i != Args.size(); ++i){
-    printf("FTy->getParamType(i): %d Args[i]->getType(): %d\n", FTy->getParamType(i), Args[i]->getType());
     assert((i >= FTy->getNumParams() ||
             FTy->getParamType(i) == Args[i]->getType()) &&
            "Calling a function with a bad signature!");
